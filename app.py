@@ -1,0 +1,1 @@
+print("SmartSearch Ranker starting...")
