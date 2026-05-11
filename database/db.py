@@ -24,3 +24,21 @@ def save_search(query, title, score):
     """, (query, title, score))
 
     connection.commit()
+
+cursor.execute("""
+CREATE TABLE IF NOT EXISTS clicks (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    query TEXT,
+    document_title TEXT
+)
+""")
+
+connection.commit()
+
+def save_click(query, title):
+    cursor.execute("""
+    INSERT INTO clicks (query, document_title)
+    VALUES (?, ?)
+    """, (query, title))
+
+    connection.commit()
