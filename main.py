@@ -11,7 +11,7 @@ print("\nResults:\n")
 for index, (score, doc) in enumerate(results, start=1):
 
     print(f"{index}. {doc['title']}")
-    print(f"Score: {score}")
+    print(f"Final Score: {score}")
     print(f"Content: {doc['content']}")
     print("-" * 40)
 

@@ -42,3 +42,16 @@ def save_click(query, title):
     """, (query, title))
 
     connection.commit()
+
+def get_click_count(query, title):
+
+    cursor.execute("""
+    SELECT COUNT(*)
+    FROM clicks
+    WHERE query = ?
+    AND document_title = ?
+    """, (query, title))
+
+    count = cursor.fetchone()[0]
+
+    return count
