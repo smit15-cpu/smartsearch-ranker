@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from search.engine import search
-
+from database.db import save_click
 
 app = FastAPI()
 
@@ -30,4 +30,16 @@ def search_api(q: str):
     return {
         "query": q,
         "results": formatted_results
+    }
+
+@app.post("/click")
+def register_click(data: dict):
+
+    query = data["query"]
+    title = data["title"]
+
+    save_click(query, title)
+
+    return {
+        "message": "Click saved successfully"
     }
