@@ -1,57 +1,50 @@
 import sqlite3
 
-
-connection = sqlite3.connect("search_engine.db")
-cursor = connection.cursor()
+DB_NAME = "search_engine.db"
 
 
-cursor.execute("""
-CREATE TABLE IF NOT EXISTS search_history (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    query TEXT,
-    document_title TEXT,
-    score REAL
-)
-""")
-
-connection.commit()
+def get_connection():
+    return sqlite3.connect(DB_NAME)
 
 
 def save_search(query, title, score):
-    cursor.execute("""
+    conn = get_connection()
+    cur = conn.cursor()
+
+    cur.execute("""
     INSERT INTO search_history (query, document_title, score)
     VALUES (?, ?, ?)
-    """, (query, title, score))
+    """, (query.lower(), title.lower(), score))
 
-    connection.commit()
+    conn.commit()
+    conn.close()
 
-cursor.execute("""
-CREATE TABLE IF NOT EXISTS clicks (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    query TEXT,
-    document_title TEXT
-)
-""")
-
-connection.commit()
 
 def save_click(query, title):
-    cursor.execute("""
+    conn = get_connection()
+    cur = conn.cursor()
+
+    cur.execute("""
     INSERT INTO clicks (query, document_title)
     VALUES (?, ?)
-    """, (query, title))
+    """, (query.lower(), title.lower()))
 
-    connection.commit()
+    conn.commit()
+    conn.close()
+
 
 def get_click_count(query, title):
+    conn = get_connection()
+    cur = conn.cursor()
 
-    cursor.execute("""
+    cur.execute("""
     SELECT COUNT(*)
     FROM clicks
     WHERE query = ?
     AND document_title = ?
-    """, (query, title))
+    """, (query.lower(), title.lower()))
 
-    count = cursor.fetchone()[0]
+    count = cur.fetchone()[0]
 
+    conn.close()
     return count
