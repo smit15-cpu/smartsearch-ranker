@@ -4,7 +4,6 @@ import requests
 
 st.set_page_config(
     page_title="SmartSearch Ranker",
-    page_icon="🔍",
     layout="wide"
 )
 
@@ -18,7 +17,7 @@ if "query" not in st.session_state:
     st.session_state.query = ""
 
 
-st.title("🔍 SmartSearch Ranker")
+st.title("SmartSearch Ranker")
 
 st.write(
     "Adaptive Search Ranking System"

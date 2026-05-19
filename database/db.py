@@ -48,3 +48,37 @@ def get_click_count(query, title):
 
     conn.close()
     return count
+
+def get_search_history():
+
+    conn = get_connection()
+    cur = conn.cursor()
+
+    cur.execute("""
+    SELECT query, document_title, score
+    FROM search_history
+    """)
+
+    rows = cur.fetchall()
+
+    conn.close()
+
+    return rows
+
+
+
+def get_clicks():
+
+    conn = get_connection()
+    cur = conn.cursor()
+
+    cur.execute("""
+    SELECT query, document_title
+    FROM clicks
+    """)
+
+    rows = cur.fetchall()
+
+    conn.close()
+
+    return rows
