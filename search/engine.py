@@ -1,55 +1,50 @@
 from data.documents import documents
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.metrics.pairwise import cosine_similarity
+from rank_bm25 import BM25Okapi
 from database.db import get_click_count
 
 
-doc_texts = [
-    doc["title"] + " " + doc["content"]
+# -----------------------------
+# PREPARE TOKENS
+# -----------------------------
+
+corpus = [
+    (doc["title"] + " " + doc["content"]).lower().split()
     for doc in documents
 ]
 
-vectorizer = TfidfVectorizer(stop_words="english")
+bm25 = BM25Okapi(corpus)
 
-document_vectors = vectorizer.fit_transform(doc_texts)
 
+# -----------------------------
+# SEARCH FUNCTION
+# -----------------------------
 
 def search(query):
 
-    query_vector = vectorizer.transform([query])
+    query_tokens = query.lower().split()
 
-    similarities = cosine_similarity(
-        query_vector,
-        document_vectors
-    ).flatten()
+    scores = bm25.get_scores(query_tokens)
 
     ranked_results = []
 
-    for index, score in enumerate(similarities):
+    for i, score in enumerate(scores):
 
-        if score > 0:
+        doc = documents[i]
 
-            doc = documents[index]
+        click_count = get_click_count(
+            query,
+            doc["title"]
+        )
 
-            click_count = get_click_count(
-                query,
-                doc["title"]
-            )
+        final_score = score + (click_count * 1.0)
 
-            boosted_score = score + (
-                click_count * 0.1
-            )
-            print(f"Original Score: {score}")
-            print(f"Clicks: {click_count}")
-            print(f"Boosted Score: {boosted_score}")
-
-            ranked_results.append(
-                (boosted_score, doc)
-            )
+        ranked_results.append(
+            (final_score, doc)
+        )
 
     ranked_results.sort(
-        reverse=True,
-        key=lambda x: x[0]
+        key=lambda x: x[0],
+        reverse=True
     )
 
     return ranked_results
