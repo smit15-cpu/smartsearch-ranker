@@ -1,6 +1,9 @@
 from fastapi import FastAPI
 from search.engine import search
-from database.db import save_click
+from database.db import (
+    save_click,
+    get_top_queries
+)
 
 app = FastAPI()
 
@@ -42,4 +45,13 @@ def register_click(data: dict):
 
     return {
         "message": "Click saved successfully"
+    }
+
+@app.get("/trending")
+def trending():
+
+    queries = get_top_queries()
+
+    return {
+        "queries": queries
     }

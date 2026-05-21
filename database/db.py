@@ -82,3 +82,24 @@ def get_clicks():
     conn.close()
 
     return rows
+
+def get_top_queries():
+
+    conn = get_connection()
+
+    cur = conn.cursor()
+
+    cur.execute("""
+    SELECT query, COUNT(*)
+    as total
+    FROM search_history
+    GROUP BY query
+    ORDER BY total DESC
+    LIMIT 10
+    """)
+
+    rows = cur.fetchall()
+
+    conn.close()
+
+    return rows

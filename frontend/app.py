@@ -24,9 +24,23 @@ st.write(
 )
 
 
-query = st.text_input(
-    "Enter your search query",
-    value=st.session_state.query
+#query = st.text_input(
+ #   "Enter your search query",
+  #  value=st.session_state.query
+#)
+
+suggestions = [
+    "python",
+    "python backend",
+    "machine learning",
+    "android",
+    "data science"
+]
+
+
+query = st.selectbox(
+    "Search",
+    [""] + suggestions
 )
 
 
@@ -100,3 +114,21 @@ if st.session_state.results:
                 st.error(
                     "Failed to register click."
                 )
+
+trend_response = requests.get(
+    "http://127.0.0.1:8000/trending"
+)
+
+if trend_response.status_code == 200:
+
+    trends = trend_response.json()
+
+    st.sidebar.title(
+        "Trending Searches"
+    )
+
+    for item in trends["queries"]:
+
+        st.sidebar.write(
+            f"{item[0]}"
+        )
