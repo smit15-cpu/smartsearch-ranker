@@ -2,9 +2,8 @@ import streamlit as st
 import requests
 
 
-# -----------------------------
 # PAGE CONFIG
-# -----------------------------
+
 
 st.set_page_config(
     page_title="SmartSearch Ranker",
@@ -12,9 +11,9 @@ st.set_page_config(
 )
 
 
-# -----------------------------
+
 # SESSION STATE
-# -----------------------------
+
 
 if "results" not in st.session_state:
     st.session_state.results = []
@@ -23,9 +22,8 @@ if "query" not in st.session_state:
     st.session_state.query = ""
 
 
-# -----------------------------
 # FETCH TRENDING
-# -----------------------------
+
 
 trending_queries = []
 
@@ -46,18 +44,16 @@ except:
     pass
 
 
-# -----------------------------
 # HEADER
-# -----------------------------
+
 
 st.title("🔍 SmartSearch Ranker")
 
 st.write("Adaptive Search Ranking System")
 
 
-# -----------------------------
+
 # SIDEBAR
-# -----------------------------
 
 st.sidebar.title("🔥 Trending Searches")
 
@@ -68,9 +64,9 @@ else:
     st.sidebar.write("No search history yet")
 
 
-# -----------------------------
+
 # SEARCH INPUT
-# -----------------------------
+
 
 default_suggestions = [
     "python",
@@ -90,9 +86,9 @@ query = st.selectbox(
 )
 
 
-# -----------------------------
+
 # SEARCH BUTTON
-# -----------------------------
+
 
 if st.button("Search") and query != "":
 
@@ -115,9 +111,9 @@ if st.button("Search") and query != "":
         st.error(response.text)
 
 
-# -----------------------------
+
 # DISPLAY RESULTS
-# -----------------------------
+
 
 if st.session_state.results:
 
