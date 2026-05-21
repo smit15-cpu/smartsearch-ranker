@@ -2,6 +2,10 @@ import streamlit as st
 import requests
 
 
+# -----------------------------
+# PAGE CONFIG
+# -----------------------------
+
 st.set_page_config(
     page_title="SmartSearch Ranker",
     layout="wide"
@@ -20,13 +24,12 @@ if "query" not in st.session_state:
 
 
 # -----------------------------
-# LOAD TRENDING SEARCHES
+# FETCH TRENDING
 # -----------------------------
 
 trending_queries = []
 
 try:
-
     trend_response = requests.get(
         "http://127.0.0.1:8000/trending"
     )
@@ -36,8 +39,7 @@ try:
         trends = trend_response.json()
 
         trending_queries = [
-            item[0]
-            for item in trends["queries"]
+            item[0] for item in trends["queries"]
         ]
 
 except:
@@ -45,35 +47,25 @@ except:
 
 
 # -----------------------------
-# UI HEADER
+# HEADER
 # -----------------------------
 
 st.title("🔍 SmartSearch Ranker")
 
-st.write(
-    "Adaptive Search Ranking System"
-)
+st.write("Adaptive Search Ranking System")
 
 
 # -----------------------------
 # SIDEBAR
 # -----------------------------
 
-st.sidebar.title(
-    "🔥 Trending Searches"
-)
+st.sidebar.title("🔥 Trending Searches")
 
 if trending_queries:
-
     for item in trending_queries:
-
         st.sidebar.write(item)
-
 else:
-
-    st.sidebar.write(
-        "No search history yet"
-    )
+    st.sidebar.write("No search history yet")
 
 
 # -----------------------------
@@ -89,46 +81,38 @@ default_suggestions = [
 ]
 
 all_suggestions = list(
-    dict.fromkeys(
-        default_suggestions +
-        trending_queries
-    )
+    dict.fromkeys(default_suggestions + trending_queries)
 )
 
 query = st.selectbox(
-    "Search",
+    "Search Query",
     [""] + all_suggestions
 )
 
 
 # -----------------------------
-# SEARCH
+# SEARCH BUTTON
 # -----------------------------
 
-if st.button("Search"):
+if st.button("Search") and query != "":
 
-    response = requests.get(
-        "http://127.0.0.1:8000/search",
-        params={
-            "q": query
-        }
-    )
+    with st.spinner("Searching intelligent index..."):
+
+        response = requests.get(
+            "http://127.0.0.1:8000/search",
+            params={"q": query}
+        )
 
     if response.status_code == 200:
 
         data = response.json()
 
-        st.session_state.results = (
-            data["results"]
-        )
-
+        st.session_state.results = data["results"]
         st.session_state.query = query
 
     else:
 
-        st.error(
-            f"Backend Error: {response.text}"
-        )
+        st.error(response.text)
 
 
 # -----------------------------
@@ -141,49 +125,47 @@ if st.session_state.results:
         f"Results for: {st.session_state.query}"
     )
 
-    for index, result in enumerate(
-        st.session_state.results
-    ):
+    for index, result in enumerate(st.session_state.results):
 
         st.markdown("---")
 
-        st.markdown(
-            f"### {result['title']}"
-        )
+        # TITLE
+        st.markdown(f"### 📄 {result['title']}")
 
-        st.write(
-            result["content"]
-        )
+        # CONTENT
+        st.write(result["content"])
 
-        st.write(
-            f"Final Score: {result['score']:.3f}"
-        )
+        # SCORE + CLICK METRICS
+        col1, col2 = st.columns(2)
 
+        with col1:
+            st.metric(
+                "Score",
+                f"{result['score']:.3f}"
+            )
+
+        with col2:
+            clicks = result.get("explanation", {}).get("clicks", 0)
+
+            st.metric(
+                "Clicks",
+                clicks
+            )
+
+        # EXPLANATION (SAFE)
         if "explanation" in result:
 
-            with st.expander(
-                "Why this ranked"
-            ):
+            with st.expander("Why this ranked"):
 
-                st.write(
-                    f"BM25 Score: {result['explanation']['bm25_score']}"
-                )
+                exp = result["explanation"]
 
-                st.write(
-                    f"Click Boost: {result['explanation']['click_boost']}"
-                )
+                st.write(f"BM25 Score: {exp.get('bm25_score', 0)}")
+                st.write(f"Click Boost: {exp.get('click_boost', 0)}")
+                st.write(f"Total Clicks: {exp.get('clicks', 0)}")
+                st.write(f"Final Score: {exp.get('final_score', 0)}")
 
-                st.write(
-                    f"Total Clicks: {result['explanation']['clicks']}"
-                )
-
-                st.write(
-                    f"Final Score: {result['explanation']['final_score']}"
-                )
-
-        if st.button(
-            f"Open Result {index}"
-        ):
+        # CLICK BUTTON
+        if st.button(f"Open Result {index}"):
 
             click_response = requests.post(
                 "http://127.0.0.1:8000/click",
@@ -195,14 +177,10 @@ if st.session_state.results:
 
             if click_response.status_code == 200:
 
-                st.success(
-                    f"Clicked: {result['title']}"
-                )
+                st.success(f"Clicked: {result['title']}")
 
-                st.session_state.results = []
+                # IMPORTANT: refresh UI state
+                st.rerun()
 
             else:
-
-                st.error(
-                    "Failed to register click."
-                )
+                st.error("Failed to register click")
