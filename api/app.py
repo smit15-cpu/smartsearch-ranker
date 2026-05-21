@@ -22,12 +22,13 @@ def search_api(q: str):
 
     formatted_results = []
 
-    for score, doc in results:
+    for score, doc, explanation in results:
 
         formatted_results.append({
             "title": doc["title"],
             "content": doc["content"],
-            "score": score
+            "score": score,
+            "explanation": explanation
         })
 
     return {
