@@ -29,7 +29,7 @@ trending_queries = []
 
 try:
     trend_response = requests.get(
-        "http://127.0.0.1:8000/trending"
+        "https://smartsearch-ranker.onrender.com/trending"
     )
 
     if trend_response.status_code == 200:
@@ -95,7 +95,7 @@ if st.button("Search") and query != "":
     with st.spinner("Searching intelligent index..."):
 
         response = requests.get(
-            "http://127.0.0.1:8000/search",
+            "https://smartsearch-ranker.onrender.com/search",
             params={"q": query}
         )
 
@@ -164,7 +164,7 @@ if st.session_state.results:
         if st.button(f"Open Result {index}"):
 
             click_response = requests.post(
-                "http://127.0.0.1:8000/click",
+                "https://smartsearch-ranker.onrender.com/click",
                 json={
                     "query": st.session_state.query,
                     "title": result["title"]
