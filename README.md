@@ -83,7 +83,7 @@ Deployment:
 
 ---
 
-## ⚡ Installation
+## Installation
 
 Install dependencies:
 
@@ -105,7 +105,7 @@ streamlit run frontend/app.py
 
 ---
 
-## 📂 Project Structure
+## Project Structure
 
 SmartSearch-ranker/
 
@@ -123,7 +123,7 @@ requirements.txt
 
 ---
 
-## 🎯 What I Learned
+## What I Learned
 
 This project helped me gain experience in:
 
